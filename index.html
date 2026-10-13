@@ -821,11 +821,47 @@ var _0x4e64 = function(input){
     if(input.enableCombinedKeeper) keepers -= nc.ha.controller;
     if(keepers > 0) nodes.keeper = _0xe3b9(ctx, keepers);
   } else if(input.deploymentScheme === 'hierarchy'){
-    nodes.pcn = {
-      title:'primary node', kind:'pcn', isVirt:ctx.isVirt, count:nc.hierarchy.pcn,
-      spec:_0xc4a1(ctx, {nodeCoef:{base:{cpu:5.5 + 0.016 * (halfEps + extEps) / 1000, ram:54 + 0.032 * (halfEps + extEps) / 1000}, step:loadCoefs.pcn.step}, pgOnNode:true, chOnNode:true, ksbOnNode:true, insideKuber:true, minSpecs:_0xCFG.limit.minSpecs.cn, hierarchy:{totalEps:halfEps + extEps}}),
-      comment:agents > 0 ? 'effective agents: ' + agents : ''
+    var maxAgentsPerNode = 20000;
+    var totalNodes = Math.ceil(agents / maxAgentsPerNode);
+    var primaryAgents = Math.ceil(agents / totalNodes);
+    var secondaryAgents = agents - primaryAgents;
+    var secondaryNodeCount = totalNodes - 1;
+    
+    var primaryEps = primaryAgents / 2;
+    primaryEps = input.enableIOAOnly ? _0x2a9e(primaryEps * 0.3) : primaryEps;
+    var primaryCtx = {
+      input:input, isVirt:isVirt, isKvm:isKvm, isSmalltenant:false,
+      effectiveAgents:primaryAgents,
+      eventCtx:{edr:{eps:primaryEps, eventSize:input.edrEventSize}, external:{eps:0, eventSize:input.externalEventSize}},
+      ksbEndpoints:Math.round(ksb * (primaryAgents / agents)),
+      activeLoadCoefs:loadCoefs, hotStorage:hotStorage * (primaryAgents / agents), coldStorage:coldStorage * (primaryAgents / agents), archiveStorage:archiveStorage
     };
+    
+    nodes.pcn = {
+      title:'virtual primary node', kind:'pcn', isVirt:true, count:1,
+      spec:_0xc4a1(primaryCtx, {nodeCoef:loadCoefs.pcn, pgOnNode:true, chOnNode:true, ksbOnNode:true, insideKuber:true, minSpecs:_0xCFG.limit.minSpecs.cn, hierarchy:{totalEps:primaryEps}}),
+      comment:'effective agents: ' + primaryAgents
+    };
+    
+    if(secondaryNodeCount > 0){
+      var secondaryAgentsPerNode = Math.ceil(secondaryAgents / secondaryNodeCount);
+      var secondaryEps = secondaryAgentsPerNode / 2;
+      secondaryEps = input.enableIOAOnly ? _0x2a9e(secondaryEps * 0.3) : secondaryEps;
+      var secondaryCtx = {
+        input:input, isVirt:isVirt, isKvm:isKvm, isSmalltenant:false,
+        effectiveAgents:secondaryAgentsPerNode,
+        eventCtx:{edr:{eps:secondaryEps, eventSize:input.edrEventSize}, external:{eps:0, eventSize:input.externalEventSize}},
+        ksbEndpoints:Math.round(ksb * (secondaryAgentsPerNode / agents)),
+        activeLoadCoefs:loadCoefs, hotStorage:hotStorage * (secondaryAgentsPerNode / agents), coldStorage:coldStorage * (secondaryAgentsPerNode / agents), archiveStorage:archiveStorage
+      };
+      
+      nodes.scn = {
+        title:'virtual secondary node', kind:'scn', isVirt:true, count:secondaryNodeCount,
+        spec:_0xc4a1(secondaryCtx, {nodeCoef:loadCoefs.scn, pgOnNode:true, chOnNode:true, ksbOnNode:true, insideKuber:true, minSpecs:_0xCFG.limit.minSpecs.cn}),
+        comment:'effective agents: ' + secondaryAgentsPerNode + ' per node'
+      };
+    }
+    
     nodes.sb = _0xc7fd(ctx);
   }
 
