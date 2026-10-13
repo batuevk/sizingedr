@@ -198,6 +198,25 @@ var _0x2f5a = function(e, platform, lowFreq, isKvm, hypOpt, extra){
   return e;
 };
 
+var _calcFilesAndSlots = function(e){
+  if(e<=0) return { filesPerHour: 0, slots: 0 };
+  var fc = {doc:5,pdf:1.9,exe:2.2,jsWin:0.7,other:0.7};
+  var n = e/1000;
+  var r = (n<10 ? 1.07*Math.pow(n,3)-22.2*Math.pow(n,2)+175*n : n*60)*1.5;
+  var i = (n<1 ? -26*Math.pow(n,2)+76*n : 22*n+33)*1.5;
+  var a = {
+    doc: r,
+    pdf: i,
+    exe: (n<1 ? -176*Math.pow(n,2)+376*n : 22*n+181)*1.5,
+    jsWin: i/5,
+    other: i/4
+  };
+  return {
+    filesPerHour: Object.keys(a).reduce(function(s,k){return s+a[k];}, 0),
+    slots: _ry.reduce(function(s,k){return s+a[k]*fc[k];}, 0)/0.9/60
+  };
+};
+
 var _0xCFG = {
   defaultGuidanceList: [
     'Резервное оборудование: рассчитывайте отдельно.',
@@ -633,10 +652,21 @@ var _0xb6ec = function(ctx, count){
 var _0xc7fd = function(ctx){
   var input = ctx.input;
   var prof = _0xCFG.sandboxProfile[input.sandboxType];
+  var sc = _0xCFG.sandboxCoef;
   var isHW = input.sandboxType !== 'hw_basic' && input.sandboxType !== 'hw_medium' && input.sandboxType !== 'hw_plus';
   var isHA = input.deploymentScheme === 'ha';
-  var count = Math.max(1, Math.ceil(ctx.effectiveAgents / 200000 * prof.mult));
+  var ksb = ctx.ksbEndpoints;
+  
+  var count = 0;
+  count += ctx.effectiveAgents / sc.divisorManual;
+  if(ksb > 0){
+    count += sc.slotMultiplier * _calcFilesAndSlots(ksb).slots / sc.vm.hw_basic;
+  }
+  count *= prof.mult;
+  count *= (input.sbHypervisorOption === 'active_mitigations' ? prof.mit : 1);
+  count = Math.max(1, Math.ceil(count));
   if(isHA) count += 1;
+  
   var diskLabel = prof.disk.label || '600 GiB';
   var diskDetail = '';
   if(prof.disk.count){
