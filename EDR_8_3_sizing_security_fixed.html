@@ -1,0 +1,1371 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сайзинг Platform EDR 8.3</title>
+<style>
+:root,html[data-theme="light"]{
+  --paper:#fbfcfc;--panel:#f1f4f5;--ink:#1a2127;--muted:#66717c;--rule:#d9dfe3;
+  --accent:#00876f;--accent-soft:#e2f2ee;--warn:#a85b00;--warn-soft:#fbf0e1;--bad:#b3261e;
+  color-scheme:light;
+}
+html[data-theme="dark"]{
+  --paper:#14191d;--panel:#1b2227;--ink:#e3e8eb;--muted:#93a0aa;--rule:#2c363d;
+  --accent:#3cc2a5;--accent-soft:#16302b;--warn:#e7a54b;--warn-soft:#33281a;--bad:#f2867e;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,sans-serif}
+header{padding:16px 24px;border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;background:var(--panel);position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:14px;min-width:0}
+.logo{width:40px;height:40px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),#00a884);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo svg{width:24px;height:24px;fill:white}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.01em;color:var(--ink);font-family:inherit}
+.meta{color:var(--muted);font-size:12px;margin-top:2px;font-family:inherit}
+.theme-toggle{background:var(--paper);border:1px solid var(--rule);border-radius:20px;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);font-weight:500;font-family:inherit}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.theme-toggle svg{width:16px;height:16px;fill:currentColor}
+.layout{display:grid;grid-template-columns:minmax(300px,380px) 1fr;min-height:calc(100vh - 73px)}
+aside{background:var(--panel);border-right:1px solid var(--rule);padding:8px 20px 28px;overflow-y:auto;max-height:calc(100vh - 73px);position:sticky;top:73px}
+aside::-webkit-scrollbar{width:6px}
+aside::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+main{padding:20px 28px 40px;min-width:0}
+fieldset{border:0;border-top:1px solid var(--rule);margin:0;padding:16px 0 12px}
+fieldset:first-child{border-top:0;padding-top:8px}
+legend{font-weight:700;font-size:12px;padding:0;margin-bottom:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;font-family:inherit}
+legend::before{content:"";width:3px;height:14px;background:var(--accent);border-radius:2px}
+.row{display:grid;grid-template-columns:1fr 150px;gap:10px;align-items:center;margin:8px 0;padding:4px 6px;border-radius:6px}
+.row:hover{background:var(--accent-soft)}
+.row label{color:var(--ink);font-size:13px;font-weight:500;font-family:inherit}
+.row .hint{display:block;color:var(--muted);font-size:11px;margin-top:2px;font-weight:400;font-family:inherit}
+.sub{font-size:12px;color:var(--muted);margin:12px 0 4px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-family:inherit}
+select,input[type=number]{width:100%;font:inherit;padding:7px 10px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink);font-family:inherit}
+select:focus,input[type=number]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:none}
+input[type=number]{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);justify-self:end;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.limit{font-size:12px;color:var(--muted);margin-top:6px;padding:8px 12px;background:var(--accent-soft);border-radius:6px;border-left:3px solid var(--accent);font-family:inherit}
+.limit.over{color:var(--bad);background:var(--warn-soft);border-left-color:var(--warn);font-weight:600}
+.load{display:flex;flex-wrap:wrap;gap:24px;margin-bottom:20px;padding:18px;background:var(--accent-soft);border-radius:10px;border:1px solid var(--accent)}
+.load div{display:flex;flex-direction:column;min-width:120px}
+.load b{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);font-family:inherit}
+.load span{color:var(--muted);font-size:12px;font-weight:500;font-family:inherit}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-family:inherit}
+th,td{padding:10px 12px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--rule);font-family:inherit}
+th{font-weight:600;font-size:12px;background:var(--accent);color:#fff;text-transform:uppercase;letter-spacing:.5px}
+td.n{font-weight:600;white-space:nowrap}
+td.disk{white-space:pre-line;min-width:170px}
+td.cm{white-space:pre-line;color:var(--muted);font-size:12px;font-style:italic}
+td.cnt{font-weight:700;white-space:nowrap;color:var(--accent);font-size:14px}
+tr:hover:not(.total){background:var(--accent-soft)}
+tr.total td{font-weight:700;border-bottom:0;background:var(--accent);color:#fff;font-size:14px}
+.kind{color:var(--muted);font-size:11px;font-style:italic;margin-top:2px;font-family:inherit}
+.quality{margin:16px 0 0;padding:12px 16px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;font-weight:600;font-size:13px;font-family:inherit}
+.quality.warn{border-color:var(--warn);background:var(--warn-soft)}
+details{margin-top:24px;border-top:1px solid var(--rule);padding-top:14px}
+summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--accent);padding:6px 0;font-family:inherit}
+summary:hover{text-decoration:underline}
+details ul{padding-left:22px;margin:10px 0 0}
+details li{margin:6px 0;white-space:pre-wrap;line-height:1.5;font-size:13px;font-family:inherit}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;padding:14px;background:var(--panel);border-radius:10px;align-items:center}
+button.act{font:inherit;padding:8px 14px;border:1px solid var(--accent);border-radius:6px;background:var(--paper);color:var(--accent);cursor:pointer;font-weight:600;font-size:13px;font-family:inherit;transition:all .3s ease}
+button.act:hover{background:var(--accent);color:#fff}
+button.act.copied{background:var(--accent);color:#fff;border-color:var(--accent);animation:pulse .4s ease}
+@keyframes pulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.05);box-shadow:0 0 0 6px var(--accent-soft)}
+  100%{transform:scale(1)}
+}
+#toast{color:var(--accent);font-size:13px;font-weight:600;margin-left:auto;font-family:inherit;padding:6px 12px;border-radius:6px;background:var(--accent-soft);opacity:0;transition:opacity .3s}
+#toast.show{opacity:1}
+.err{color:var(--bad);white-space:pre-wrap;padding:14px;background:var(--warn-soft);border-radius:8px;border-left:4px solid var(--bad);font-weight:600;font-family:inherit}
+.disclaimer{margin-bottom:24px;padding:16px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:8px;font-size:13px;color:var(--ink);line-height:1.6;font-family:inherit}
+.disclaimer-title{font-weight:700;color:var(--warn);margin-bottom:8px;display:flex;align-items:center;gap:8px;font-size:14px;font-family:inherit}
+.disclaimer p{margin:8px 0}
+.disclaimer ul{margin:8px 0 0 20px;padding:0}
+.disclaimer ul li{margin:4px 0}
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr}
+  aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--rule)}
+  main{padding:16px}
+  header{padding:12px 16px}
+  h1{font-size:16px}
+  .row{grid-template-columns:1fr 120px;gap:8px}
+  .load{gap:16px;padding:14px}
+  .load b{font-size:20px}
+  td.disk{min-width:140px}
+}
+@media (max-width:480px){
+  .row{grid-template-columns:1fr;gap:4px}
+  .row input[type=checkbox]{justify-self:start}
+  .load{flex-direction:column;gap:12px}
+  .load div{flex-direction:row;justify-content:space-between;align-items:center}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg>
+    </div>
+    <div>
+      <h1>Сайзинг Platform EDR 8.3</h1>
+      <div class="meta">Калькулятор ресурсов для развёртывания Kaspersky EDR Expert</div>
+    </div>
+  </div>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">
+    <svg id="themeIcon" viewBox="0 0 24 24"></svg>
+    <span id="themeLabel">Тёмная</span>
+  </button>
+</header>
+<div class="layout">
+  <aside id="form"></aside>
+  <main id="out"></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var _0x={};
+_0x._s=function(s){try{return atob(s)}catch(e){return s}};
+_0x._k=['YmFja3Vw','U1NE','SERE','Q2xpY2tIb3VzZQ==','UG9zdGdyZVNRTA==','VmlydHVhbCBwbGF0Zm9ybQ==','QXJjaGl2ZQ==','UmVjb21tZW5kZWQ=','U2luZ2xlbm9kZQ==','RVhU'];
+_0x._g=function(i){return _0x._s(_0x._k[i])};
+
+var _0x4e3a = [
+  '0123456789abcdef',
+  'nutanix,proxmox,brest,redvirt,zvirt',
+  'linuxServers,windowsServers,linuxEndpoints,windowsEndpoints,macEndpoints',
+  'doc,pdf,exe,jsWin,other',
+  'cn,pcn,scn,controller,worker,worker1,worker2,worker3,dbms,kuma,collector,correlator,storage,keeper,netflow,archive,sb'
+];
+
+var _ty = _0x4e3a[1].split(',');
+var _ny = _0x4e3a[2].split(',');
+var _ry = _0x4e3a[3].split(',');
+var _iy = _0x4e3a[4].split(',');
+
+var _0x7f2b = function(e){ return e / Math.pow(1.024, 3); };
+var _0x8c1d = function(e){ return e < 1000 ? e + ' GiB' : (e/1024).toFixed(1) + ' TiB'; };
+
+var _0x2a9e = function(e, t){
+  t = t || 2;
+  if(e<=0) return 0;
+  var n = Math.pow(10, Math.max(0, Math.floor(Math.log10(e))-(t-1)));
+  return Math.ceil(e/n)*n;
+};
+
+var _0x3b5f = function(e, t, n){
+  n = n || 1000;
+  if(e<=0) return 0;
+  if(t){
+    var tiers = [0,50,100,150,250,500,750];
+    for(var i=0;i<tiers.length;i++){ if(e<=tiers[i]) return tiers[i]; }
+  }
+  return Math.ceil(e/n)*n;
+};
+
+var _0x9d4c = function(e){ return _ty.indexOf(e) !== -1; };
+var _0x1e7a = function(e){ return e ? (Array.isArray(e) ? e : [e]) : []; };
+
+var _0x5f8b = function(e, t, fn){
+  return {
+    base:{ cpu: fn(e.base.cpu, t.base.cpu), ram: fn(e.base.ram, t.base.ram) },
+    step:{
+      edr:{ cpu: fn(e.step.edr.cpu, t.step.edr.cpu), ram: fn(e.step.edr.ram, t.step.edr.ram) },
+      external:{ cpu: fn(e.step.external.cpu, t.step.external.cpu), ram: fn(e.step.external.ram, t.step.external.ram) }
+    }
+  };
+};
+
+var _0x6c3d = function(e, t){ return _0x5f8b(e, t, function(a,b){return a+b;}); };
+
+var _0x4a2e = function(e, t){ return Math.ceil(e/t - 0.15) * t; };
+var _0x7b9f = function(e, t){ var n = e < 20 || t ? 2 : e < 56 ? 4 : 8; return Math.ceil(e/n - 0.15) * n; };
+var _0x8d1c = function(e, t){ var n = t ? 4 : e < 80 ? 8 : 16; return Math.ceil(e/n - 0.15) * n; };
+
+var _0x2f5a = function(e, platform, lowFreq, isKvm, hypOpt, extra){
+  e *= lowFreq ? 1.5 : 1;
+  if(platform === 'hardware') return e;
+  e *= 1.1;
+  if(isKvm){ e *= hypOpt === 'active_mitigations' ? 1.5 : 1.3; }
+  if(extra) e *= extra;
+  return e;
+};
+
+var _0xCFG = {
+  defaultGuidanceList: [
+    'Резервное оборудование: рассчитывайте отдельно.',
+    'Расчёт основан на CPU 2.7 ГГц (2.1 ГГц для низкочастотных конфигураций).',
+    'Для узлов хранения данных и горячего хранилища рекомендуется использование NVMe SSD.',
+    'Холодное хранилище не требует SSD и может использовать HDD.',
+    'Для виртуальной платформы: выделите ВМ 100% CPU, RAM и дискового пространства.',
+    'Финальная спецификация должна быть согласована с вендором.'
+  ],
+  limit: {
+    agentsPerScheme: {
+      default: {
+        smalltenant:{edr:750,external:0}, single:{edr:20000,external:10000},
+        kedr_multi:{edr:30000,external:0},
+        multi:{edr:100000,external:250000}, ha:{edr:100000,external:250000},
+        hierarchy:{edr:3000000,external:1500000}
+      }
+    },
+    minSpecs:{cn:{cpu:4,ram:22},worker:{cpu:4,ram:22},kuma:{cpu:16,ram:32},collector:{cpu:8,ram:16},correlator:{cpu:8,ram:16},dbms:{cpu:6,ram:10}},
+    clickHouse:{
+      replicas:{multi:1,ha:2}, keepers:{multi:1,ha:3}, maxReplicas:5,
+      epsPerInstance:{lowFreq:10000,default:13000,kedr_multi:15000},
+      minShardsCount:1, quality:{success:130,acceptable:150,warning:200}
+    },
+    nodeCount:{
+      single:{cn:1,dbms:1},
+      kedr_multi:{controller:1,w1:1,w2:1,w3:1},
+      multi:{controller:1,worker:3,kuma:1,dbms:1},
+      ha:{controller:3,worker:4,collector:2,correlator:2,dbms:3},
+      hierarchy:{pcn:1,cn:150}
+    },
+    kuma:{maxHotDays:180,maxColdDays:180,maxArchiveDays:3650,minBytes:10,maxBytes:10000},
+    nodeConstraints:{minStorage:1000,maxDisksPerNode:16,minDisksRaid10:4,hardwareCap:{cpu:64,ram:512},virtualCap:{cpu:32,ram:256}},
+    testedEpsCap:50000
+  },
+  loadCoefs:{
+    smalltenant:{
+      cn:{base:{cpu:4.5,ram:12},step:{edr:{cpu:2.22,ram:30},external:{cpu:0,ram:0}}},
+      dbms:{base:{cpu:1,ram:7},step:{edr:{cpu:0.4,ram:1.6},external:{cpu:0.1,ram:0.2}}}
+    },
+    single:{
+      cn:{base:{cpu:4.5,ram:40.5},step:{edr:{cpu:2.22,ram:3.68},external:{cpu:1.92,ram:0.8}}},
+      dbms:{base:{cpu:1,ram:7},step:{edr:{cpu:0.4,ram:1.6},external:{cpu:0.1,ram:0.2}}}
+    },
+    kedr_multi:{
+      worker:{base:{cpu:4,ram:9},step:{edr:{cpu:0.6,ram:2},external:{cpu:0,ram:0}}},
+      dbms:{base:{cpu:1,ram:7},step:{edr:{cpu:0.4,ram:1.6},external:{cpu:0.1,ram:0.2}}}
+    },
+    multi:{
+      worker:{base:{cpu:8,ram:20.67},step:{edr:{cpu:0.9,ram:1.2},external:{cpu:0.15,ram:0}}},
+      kuma:{base:{cpu:2,ram:12},step:{edr:{cpu:0.46,ram:1.2},external:{cpu:1.35,ram:0.15}}},
+      collector:{base:{cpu:1,ram:6},step:{edr:{cpu:0.46,ram:1.2},external:{cpu:0.45,ram:0}}},
+      correlatorEdrOnly:{base:{cpu:1,ram:32},step:{edr:{cpu:0,ram:0},external:{cpu:0.9,ram:0.15}}},
+      correlatorWithExternal:{base:{cpu:1,ram:16},step:{edr:{cpu:0,ram:0},external:{cpu:0.9,ram:0.15}}},
+      storage:{base:{cpu:1.5,ram:4},step:{edr:{cpu:0.16,ram:0},external:{cpu:0.16,ram:0}}},
+      dbms:{base:{cpu:1,ram:7},step:{edr:{cpu:0.4,ram:1.6},external:{cpu:0.1,ram:0.2}}},
+      dbmsLargeScale:{base:{cpu:4.4,ram:29},step:{edr:{cpu:0.227,ram:0.667},external:{cpu:0.1,ram:0.2}}}
+    },
+    ha:{
+      worker:{base:{cpu:8,ram:20.67},step:{edr:{cpu:0.9,ram:1.2},external:{cpu:0.15,ram:0}}},
+      collector:{base:{cpu:1,ram:6},step:{edr:{cpu:0.46,ram:1.2},external:{cpu:0.45,ram:0}}},
+      correlatorEdrOnly:{base:{cpu:1,ram:32},step:{edr:{cpu:0,ram:0},external:{cpu:0.9,ram:0.15}}},
+      correlatorWithExternal:{base:{cpu:1,ram:16},step:{edr:{cpu:0,ram:0},external:{cpu:0.9,ram:0.15}}},
+      dbms:{base:{cpu:1,ram:7},step:{edr:{cpu:0.4,ram:1.6},external:{cpu:0.1,ram:0.2}}},
+      dbmsLargeScale:{base:{cpu:4.4,ram:29},step:{edr:{cpu:0.227,ram:0.667},external:{cpu:0.1,ram:0.2}}}
+    },
+    hierarchy:{
+      pcn:{base:{cpu:5.5,ram:54},step:{edr:{cpu:2.52,ram:4.92},external:{cpu:1.92,ram:0.8}}},
+      scn:{base:{cpu:5.5,ram:54},step:{edr:{cpu:2.56,ram:5},external:{cpu:1.96,ram:0.88}}},
+      dbms:{base:{cpu:1,ram:7},step:{edr:{cpu:0.4,ram:1.6},external:{cpu:0.1,ram:0.2}}}
+    }
+  },
+  dbOverhead:{
+    ch:{base:{cpu:0.7,ram:2.5},step:{edr:{cpu:0.4,ram:0.5},external:{cpu:0,ram:0}}},
+    pg:{base:{cpu:2,ram:24},step:{edr:{cpu:0,ram:0.6},external:{cpu:0,ram:0}}},
+    pg_smalltenant:{base:{cpu:1,ram:4},step:{edr:{cpu:0.3,ram:10},external:{cpu:0,ram:0}}},
+    pg_sn:{base:{cpu:1,ram:13.5},step:{edr:{cpu:0.3,ram:1.24},external:{cpu:0,ram:0}}}
+  },
+  smalltenantTiers:[0,50,100,150,250,500,750],
+  haRedundancy:{collector:1,correlator:2,worker:1},
+  tibDisplayThreshol:10000,
+  extraCpuMultiplier:{
+    kuma:{proxmox:{storageInside:1.1,storageOutside:1.3}},
+    collector:{proxmox:1.3}
+  },
+  hierarchyOverhead:{
+    pcn:{cpu:{base:5.5,step:0.016},ram:{base:54,step:0.032}},
+    scn:{cpu:{base:5.5,step:0.008},ram:{base:54,step:0.016}}
+  },
+  storageConfigs:[
+    {key:'24_64',cpu:24,ram:64},{key:'32_96',cpu:32,ram:96},{key:'32_128',cpu:32,ram:128},
+    {key:'48_256',cpu:48,ram:256},{key:'48_512',cpu:48,ram:512},
+    {key:'64_256',cpu:64,ram:256},{key:'64_512',cpu:64,ram:512}
+  ],
+  nodeSpecs:{
+    controller:{cpu:6,ram:8,disk:{volumeGiB:500,virtual:'500 GiB',physical:{hdd:'500 GiB \n (2× 600 GB HDD RAID 1)',ssd:'500 GiB \n (2× 960 GB SSD RAID 1)'}}},
+    keeper:{cpu:6,ram:12,disk:{volumeGiB:200,virtual:'200 GiB',physical:{hdd:'200 GiB \n (2× 300 GB HDD RAID 1)',ssd:'200 GiB \n (2× 240 GB SSD RAID 1)'}}},
+    collector:{disk:{volumeGiB:600,virtual:'600 GiB',physical:{hdd:'600 GiB \n (2× 600 GB HDD RAID 1)',ssd:'600 GiB \n (2× 960 GB SSD RAID 1)'}}},
+    correlator:{disk:{volumeGiB:600,virtual:'600 GiB',physical:{hdd:'600 GiB \n (2× 600 GB HDD RAID 1)',ssd:'600 GiB \n (2× 960 GB SSD RAID 1)'}}}
+  },
+  fileCoefs:{doc:5,pdf:1.9,exe:2.2,jsWin:0.7,other:0.7},
+  weights:{windowsEndpoints:1,windowsServers:20,linuxEndpoints:3,linuxServers:20,macEndpoints:3},
+  postgres:{divisor:25,claimedStorage:1000,disk:{base:-200,step:0.16},diskHierarchy:{base:1000,step:0.005},largeScaleThreshold:50000},
+  clickHouse:{baseRetentionDays:60,baseStorageGiB:8192,storageGrowthCoef:1060,daysDivisor:30,ramDivisor:120,mibPerEps:37.14},
+  smallClickHouse:{baseRetentionDays:30,baseStorageGiB:400,storageGrowthCoef:1060,daysDivisor:30,ramDivisor:120},
+  rounding:{step:1000,extStep:500,cpuDivisor:2,cpuSmallDivisor:1,ramDivisor:8,ramSmallDivisor:4},
+  disk:{
+    systemGiB:300, kuberEfficiencyFactor:0.85, ext4EfficiencyFactor:0.95,
+    ssd:[{volumeGiB:_0x7f2b(960),label:'960 GB SSD'},{volumeGiB:_0x7f2b(1920),label:'1920 GB SSD'},{volumeGiB:_0x7f2b(3840),label:'3840 GB SSD'},{volumeGiB:_0x7f2b(7680),label:'7680 GB SSD'}],
+    hdd:[{volumeGiB:_0x7f2b(1200),label:'1200 GB HDD'},{volumeGiB:_0x7f2b(2400),label:'2400 GB HDD'}],
+    raid1:'RAID 1', raid10:'RAID 10'
+  },
+  cpuAdjustment:{esxi:1.1,kvm:1.3,kvm_mit:1.5},
+  telemetry:{ioaCoef:0.3},
+  frequency:{lowFreqCoef:1.5},
+  sandboxCoef:{vm:{hw_basic:48,hw_medium:72,hw_plus:144,virtual:12},slotMultiplier:1.2,divisorManual:200000},
+  sandboxProfile:{
+    hw_basic:{isVirt:false,cpu:32,freq:'@2.6GHz',ram:80,disk:{volumeGiB:600,label:'600 GB HDD',count:2,raid:1,type:'hdd'},mult:1,mit:1,info:'48 VMs на узел'},
+    hw_medium:{isVirt:false,cpu:48,freq:'@2.6GHz',ram:128,disk:{volumeGiB:600,label:'600 GB HDD',count:2,raid:1,type:'hdd'},mult:2/3,mit:1,info:'72 VMs на узел'},
+    hw_plus:{isVirt:false,cpu:96,freq:'@2.6GHz',ram:256,disk:{volumeGiB:900,label:'900 GB HDD',count:2,raid:1,type:'hdd'},mult:5/14,mit:1,info:'144 VMs на узел'},
+    esxi:{isVirt:true,cpu:15,freq:'@2.1GHz',ram:32,disk:{volumeGiB:600},mult:6.75,mit:1,info:'12 VMs на узел'},
+    brest:{isVirt:true,cpu:15,freq:'@2.1GHz',ram:32,disk:{volumeGiB:600},mult:13,mit:1.5,info:'12 VMs на узел'},
+    redvirt:{isVirt:true,cpu:15,freq:'@2.1GHz',ram:32,disk:{volumeGiB:600},mult:12.5,mit:1.5,info:'12 VMs на узел'},
+    zvirt:{isVirt:true,cpu:15,freq:'@2.1GHz',ram:32,disk:{volumeGiB:600},mult:13,mit:1.5,info:'12 VMs на узел'}
+  }
+};
+
+var _DEF = {
+  mode:'default', product:'edr', deploymentScheme:'single', platform:'esxi',
+  hypervisorOption:'not_vulnerable', diskType:'ssd',
+  shardsClickHouse:1, replicasClickHouse:1, keepersClickHouse:1,
+  enableCombinedKeeper:true, enableExtDBMS:false, emptyPrimary:false,
+  enableLowFreq:false, enableIOAOnly:false,
+  windowsEndpoints:0, windowsServers:0, linuxEndpoints:0, linuxServers:0, macEndpoints:0,
+  externalEps:0, kumaHotStorageDays:30, kumaColdStorageDays:0,
+  coldStorageDiskType:'hdd', kumaArchiveStorageDays:0, netflowSize:0,
+  edrEventSize:600, externalEventSize:300, storageConfig:'auto',
+  sandboxAutoSend:false, sandboxType:'hw_basic', sbHypervisorOption:'not_vulnerable',
+  ksbEndpoints:0
+};
+
+var _OPT = {
+  deploymentScheme:[
+    {label:'Single node',value:'single'},
+    {label:'KEDR Multi Node (4)',value:'kedr_multi'},
+    {label:'Multi Node (6+)',value:'multi'},
+    {label:'High availability (16+)',value:'ha'},
+    {label:'Hierarchy',value:'hierarchy'}
+  ],
+  platform:[
+    {label:'Hardware',value:'hardware'},{label:'ESXi',value:'esxi'},{label:'Hyper-V',value:'hyper'},
+    {label:'Nutanix',value:'nutanix'},{label:'Proxmox VE',value:'proxmox'},
+    {label:'Astra Brest',value:'brest'},{label:'Red Virtualization',value:'redvirt'},{label:'zVirt',value:'zvirt'}
+  ],
+  hypervisorOption:[
+    {label:'not vulnerable',value:'not_vulnerable'},
+    {label:'active mitigations',value:'active_mitigations'}
+  ],
+  keepers:[1,3,5,7].map(function(e){return {label:String(e),value:String(e)};}),
+  diskType:[{label:'HDD',value:'hdd'},{label:'SSD',value:'ssd'}],
+  storageConfig:[
+    {label:'Auto',value:'auto'},{label:'24 CPU / 64 GiB RAM',value:'24_64'},
+    {label:'32 CPU / 96 GiB RAM',value:'32_96'},{label:'32 CPU / 128 GiB RAM',value:'32_128'},
+    {label:'48 CPU / 256 GiB RAM',value:'48_256'},{label:'48 CPU / 512 GiB RAM',value:'48_512'},
+    {label:'64 CPU / 256 GiB RAM',value:'64_256'},{label:'64 CPU / 512 GiB RAM',value:'64_512'}
+  ],
+  sandboxType:[
+    {label:'Hardware basic',value:'hw_basic'},
+    {label:'Hardware medium',value:'hw_medium'},
+    {label:'Hardware plus',value:'hw_plus',disabled:true},
+    {label:'ESXi',value:'esxi'},{label:'Astra Brest',value:'brest'},
+    {label:'Red Virtualization',value:'redvirt'},{label:'zVirt',value:'zvirt'}
+  ]
+};
+
+var _0xc4a1 = function(ctx, spec){
+  var input = ctx.input;
+  var nodeCoef = spec.nodeCoef;
+  var S = ctx.eventCtx.edr.eps / 1000;
+  var C = ctx.eventCtx.external.eps / 1000;
+  var D = nodeCoef.base.cpu;
+  var O = nodeCoef.base.ram;
+  D += nodeCoef.step.edr.cpu * S;
+  O += nodeCoef.step.edr.ram * S;
+  D += nodeCoef.step.external.cpu * C;
+  O += nodeCoef.step.external.ram * C;
+
+  if(spec.ksbOnNode && ctx.ksbEndpoints > 0){
+    var isHA = input.deploymentScheme === 'ha';
+    var prof = _0xCFG.sandboxProfile[input.sandboxType];
+    var sbCount = Math.max(1, Math.ceil(ctx.effectiveAgents / 200000 * prof.mult));
+    if(isHA) sbCount += 1;
+    var i = ctx.ksbEndpoints / 1000;
+    var n = input.ksbEndpoints / 1000;
+    var filesRate = (n<10 ? 1.07*Math.pow(n,3)-22.2*Math.pow(n,2)+175*n : n*60)*1.5;
+    var c = 100 * sbCount / 1000;
+    var l = 3 * filesRate / 10 / 3600;
+    D += c + l;
+    O += 0.2 * i + 1;
+  }
+  if(spec.chOnNode){
+    var ch = ctx.isSmalltenant ? _0xCFG.smallClickHouse : _0xCFG.clickHouse;
+    var eps = input.enableIOAOnly ? _0x2a9e(ctx.eventCtx.edr.eps * 0.3) : ctx.eventCtx.edr.eps;
+    var hotDays = input.kumaHotStorageDays;
+    if(hotDays > 0){
+      var p = eps / 1000;
+      var m = ctx.eventCtx.external.eps / 1000;
+      var h = Math.max(0, hotDays - ch.baseRetentionDays);
+      var g = ch.storageGrowthCoef * hotDays * p / ch.daysDivisor;
+      g *= ctx.eventCtx.edr.eventSize / 600;
+      var ext = ch.storageGrowthCoef * hotDays * m / ch.daysDivisor;
+      ext *= ctx.eventCtx.external.eventSize / 600;
+      var v = g + ext;
+      var y = v - ch.baseStorageGiB;
+      var b = v * h / hotDays;
+      O += Math.max(0, y, b) / ch.ramDivisor;
+    }
+  }
+  if(input.platform === 'nutanix' && (input.deploymentScheme === 'single' || input.deploymentScheme === 'hierarchy')){
+    O += 8;
+  }
+  D = _0x2f5a(D, input.platform, input.enableLowFreq, ctx.isKvm, input.hypervisorOption, spec.extraCpuMultiplier);
+  D = Math.max(D, spec.minSpecs.cpu);
+  O = Math.max(O, spec.minSpecs.ram);
+  var cpu = ctx.isSmalltenant ? _0x4a2e(D, 1) : _0x7b9f(D, ctx.isSmalltenant);
+  var ram = ctx.isSmalltenant ? _0x4a2e(O, 4) : _0x8d1c(O, ctx.isSmalltenant);
+
+  var isVirt = ctx.isVirt;
+  var diskType = input.diskType;
+  var pgStorage = 0;
+  if(spec.pgOnNode){
+    pgStorage = Math.max(Math.ceil((ctx.eventCtx.edr.eps + ctx.eventCtx.external.eps) * 0.16 - 200), 0);
+    pgStorage = Math.max(pgStorage, 1000);
+  }
+  var rawStorage = 300;
+  if(spec.chOnNode) rawStorage += ctx.hotStorage;
+  rawStorage += pgStorage;
+  rawStorage /= isVirt ? 0.95 * 0.85 : 0.95;
+  rawStorage = Math.max(1000, rawStorage);
+  var diskGiB = Math.ceil(rawStorage < 10000 ? _0x2a9e(rawStorage) : _0x2a9e(rawStorage, 3));
+  var diskLabel = _0x8c1d(diskGiB);
+  if(!isVirt){
+    var arr = _0xCFG.disk[diskType];
+    var r0 = arr[0];
+    var info;
+    if(diskType === 'ssd' && rawStorage <= r0.volumeGiB){
+      info = {count:2, label:r0.label, raid:1};
+    } else {
+      var r = arr.find(function(x){return rawStorage <= 6*x.volumeGiB;}) || arr[arr.length-1];
+      info = {count:Math.max(4, Math.ceil(rawStorage/r.volumeGiB)*2), label:r.label, raid:10};
+    }
+    var raid = info.raid === 1 ? 'RAID 1' : 'RAID 10';
+    diskLabel += ' \n (' + info.count + '× ' + info.label + ' ' + raid + ')';
+  }
+  var coldGiB = 0, coldLabel = '';
+  if(spec.chOnNode && ctx.coldStorage > 0){
+    coldGiB = ctx.coldStorage;
+    coldLabel = _0x8c1d(coldGiB) + (isVirt ? '' : ' (' + input.coldStorageDiskType.toUpperCase() + ')');
+  }
+  var disk = {volumeGiB:diskGiB, label:diskLabel, coldVolumeGiB:coldGiB, coldLabel:coldLabel};
+  return {cpu:cpu, ram:ram, disk:disk};
+};
+
+var _0xe7b2 = function(input){
+  var w = _0xCFG.weights;
+  var sum = 0;
+  for(var i=0;i<_ny.length;i++){ sum += w[_ny[i]] * (input[_ny[i]] || 0); }
+  var isSmall = input.deploymentScheme === 'single' && (input.platform === 'esxi' || _0x9d4c(input.platform));
+  return _0x3b5f(sum, isSmall);
+};
+
+var _0xf3c4 = function(ctx, count){
+  var input = ctx.input;
+  var isSmall = ctx.isSmalltenant;
+  var coef = ctx.activeLoadCoefs.cn;
+  if(!input.enableExtDBMS){
+    coef = isSmall ? _0x6c3d(coef, _0xCFG.dbOverhead.pg_smalltenant) : _0x6c3d(coef, _0xCFG.dbOverhead.pg_sn);
+  }
+  return {
+    title:ctx.isVirt ? 'virtual node' : 'physical node', kind:'cn', isVirt:ctx.isVirt, count:count,
+    spec:_0xc4a1(ctx, {nodeCoef:coef, pgOnNode:!input.enableExtDBMS, chOnNode:true, ksbOnNode:true, insideKuber:true, minSpecs:_0xCFG.limit.minSpecs.cn}),
+    comment:''
+  };
+};
+
+var _0xa8d5 = function(ctx, count){
+  var input = ctx.input;
+  var spec = _0xCFG.nodeSpecs.controller;
+  var diskLabel = input.diskType === 'hdd' ? spec.disk.physical.hdd : spec.disk.physical.ssd;
+  return {
+    title:ctx.isVirt ? 'virtual controller node' : 'physical controller node', kind:'controller', isVirt:ctx.isVirt, count:count,
+    spec:{cpu:spec.cpu, ram:spec.ram, disk:{volumeGiB:spec.disk.volumeGiB, label:ctx.isVirt ? spec.disk.virtual : diskLabel}},
+    comment:input.enableCombinedKeeper && input.deploymentScheme === 'ha' ? 'ClickHouse keeper' : ''
+  };
+};
+
+var _0xb9e6 = function(ctx, count, opts, extra){
+  extra = extra || 0;
+  var input = ctx.input;
+  var wKind = opts.workerKind;
+  var scaled = {
+    input:ctx.input, isVirt:ctx.isVirt, isKvm:ctx.isKvm, isSmalltenant:ctx.isSmalltenant,
+    effectiveAgents: ctx.effectiveAgents / count,
+    eventCtx:{
+      edr:{eps:ctx.eventCtx.edr.eps / count, eventSize:ctx.eventCtx.edr.eventSize},
+      external:{eps:ctx.eventCtx.external.eps / count, eventSize:ctx.eventCtx.external.eventSize}
+    },
+    ksbEndpoints: ctx.ksbEndpoints / count,
+    activeLoadCoefs:ctx.activeLoadCoefs, hotStorage:ctx.hotStorage / count, coldStorage:ctx.coldStorage / count, archiveStorage:ctx.archiveStorage
+  };
+  var m = wKind.match(/\d+/);
+  var num = m ? Number(m[0]) : '';
+  var coef = ctx.activeLoadCoefs.worker;
+  var notes = [];
+  if(opts.chOnNode){
+    if(input.deploymentScheme === 'kedr_multi') coef = _0x6c3d(coef, _0xCFG.dbOverhead.ch);
+    notes.push('ClickHouse storage', 'ClickHouse keeper');
+  }
+  if(opts.pgOnNode){
+    if(input.deploymentScheme === 'kedr_multi'){
+      coef = _0x6c3d(coef, _0xCFG.dbOverhead.pg);
+      notes.push('PostgreSQL');
+    } else if(num === 1 || num === 2){
+      notes.push('PostgreSQL secondary');
+    } else {
+      notes.push('ClickHouse keeper', 'PostgreSQL primary');
+    }
+  }
+  var spec = _0xc4a1(scaled, {...opts, ksbOnNode:true, insideKuber:true, nodeCoef:coef, minSpecs:_0xCFG.limit.minSpecs.worker});
+  return {
+    title:'worker node ' + num, kind:wKind, isVirt:ctx.isVirt, count:count + extra,
+    spec:spec, comment:notes.join('\n')
+  };
+};
+
+var _0xc1f7 = function(ctx, count){
+  var input = ctx.input;
+  var eps = input.enableIOAOnly ? _0x2a9e(ctx.eventCtx.edr.eps * 0.3) : ctx.eventCtx.edr.eps;
+  var multi = input.shardsClickHouse * input.replicasClickHouse > 1;
+  var coef = ctx.activeLoadCoefs.kuma;
+  if(!multi) coef = _0x6c3d(coef, _0xCFG.dbOverhead.ch);
+  var extra = 1;
+  if(input.platform === 'proxmox'){
+    extra = multi ? 1.3 : 1.1;
+  }
+  var spec = _0xc4a1({...ctx, eventCtx:{...ctx.eventCtx, edr:{...ctx.eventCtx.edr, eps:eps}}}, {
+    nodeCoef:coef, pgOnNode:false, chOnNode:!multi, ksbOnNode:false, insideKuber:false,
+    minSpecs:_0xCFG.limit.minSpecs.kuma, extraCpuMultiplier:input.platform === 'proxmox' ? extra : 1
+  });
+  var comment = 'Collector \n Correlator \n ' + (multi ? '' : (input.enableCombinedKeeper ? 'ClickHouse storage \n ClickHouse keeper' : 'ClickHouse storage'));
+  return {title:'KUMA node', kind:'kuma', isVirt:ctx.isVirt, count:count, spec:spec, comment:comment};
+};
+
+var _0xd2a8 = function(ctx, count, withKeeper){
+  var input = ctx.input;
+  var per = ctx.hotStorage / input.shardsClickHouse;
+  var cfg = _0xCFG.storageConfigs[0];
+  if(input.storageConfig !== 'auto'){
+    cfg = _0xCFG.storageConfigs.find(function(x){return x.key === input.storageConfig;}) || cfg;
+  } else {
+    var filtered = _0xCFG.storageConfigs.filter(function(x){return per / x.ram <= 150;});
+    if(filtered.length > 0){
+      var minRam = Math.min.apply(null, filtered.map(function(x){return x.ram;}));
+      cfg = filtered.filter(function(x){return x.ram === minRam;}).reduce(function(a,b){return b.cpu < a.cpu ? b : a;});
+    } else {
+      cfg = _0xCFG.storageConfigs[_0xCFG.storageConfigs.length - 1];
+    }
+  }
+  var diskGiB = Math.ceil(per < 10000 ? _0x2a9e(per) : _0x2a9e(per, 3));
+  var diskLabel = _0x8c1d(diskGiB);
+  var coldGiB = 0, coldLabel = '';
+  if(ctx.coldStorage > 0){
+    var coldPer = ctx.coldStorage / input.shardsClickHouse;
+    coldGiB = Math.ceil(coldPer < 10000 ? _0x2a9e(coldPer) : _0x2a9e(coldPer, 3));
+    coldLabel = _0x8c1d(coldGiB) + (ctx.isVirt ? '' : ' (' + input.coldStorageDiskType.toUpperCase() + ')');
+  }
+  var disk = {volumeGiB:diskGiB, label:diskLabel, coldVolumeGiB:coldGiB, coldLabel:coldLabel};
+  return {
+    title:'ClickHouse storage node', kind:'storage', isVirt:ctx.isVirt, count:count,
+    spec:{cpu:cfg.cpu, ram:cfg.ram, disk:disk},
+    comment:withKeeper ? 'ClickHouse keeper' : ''
+  };
+};
+
+var _0xe3b9 = function(ctx, count){
+  var input = ctx.input;
+  var spec = _0xCFG.nodeSpecs.keeper;
+  var diskLabel = input.diskType === 'hdd' ? spec.disk.physical.hdd : spec.disk.physical.ssd;
+  return {
+    title:'ClickHouse keeper node', kind:'keeper', isVirt:ctx.isVirt, count:count,
+    spec:{cpu:spec.cpu, ram:spec.ram, disk:{volumeGiB:spec.disk.volumeGiB, label:ctx.isVirt ? spec.disk.virtual : diskLabel}},
+    comment:''
+  };
+};
+
+var _0xf4ca = function(ctx, count){
+  var input = ctx.input;
+  var eps = input.enableIOAOnly ? _0x2a9e(ctx.eventCtx.edr.eps * 0.3) : ctx.eventCtx.edr.eps;
+  var extra = input.platform === 'proxmox' ? 1.3 : 1;
+  var spec = _0xc4a1({...ctx, eventCtx:{...ctx.eventCtx, edr:{...ctx.eventCtx.edr, eps:eps}}}, {
+    nodeCoef:ctx.activeLoadCoefs.collector, pgOnNode:false, chOnNode:false, ksbOnNode:false, insideKuber:false,
+    minSpecs:_0xCFG.limit.minSpecs.collector, extraCpuMultiplier:extra
+  });
+  spec.disk.volumeGiB = _0xCFG.nodeSpecs.collector.disk.volumeGiB;
+  spec.disk.label = ctx.isVirt ? _0xCFG.nodeSpecs.collector.disk.virtual : _0xCFG.nodeSpecs.collector.disk.physical.ssd;
+  return {title:'collector node', kind:'collector', isVirt:ctx.isVirt, count:count, spec:spec, comment:''};
+};
+
+var _0xa5db = function(ctx, count){
+  var input = ctx.input;
+  var hasExt = ctx.eventCtx.external.eps > 0;
+  var coef = hasExt ? ctx.activeLoadCoefs.correlatorWithExternal : ctx.activeLoadCoefs.correlatorEdrOnly;
+  var eps = input.enableIOAOnly ? _0x2a9e(ctx.eventCtx.edr.eps * 0.3) : ctx.eventCtx.edr.eps;
+  var spec = _0xc4a1({...ctx, eventCtx:{...ctx.eventCtx, edr:{...ctx.eventCtx.edr, eps:eps}}}, {
+    nodeCoef:coef, pgOnNode:false, chOnNode:false, ksbOnNode:false, insideKuber:false,
+    minSpecs:_0xCFG.limit.minSpecs.correlator
+  });
+  spec.disk.volumeGiB = _0xCFG.nodeSpecs.correlator.disk.volumeGiB;
+  spec.disk.label = ctx.isVirt ? _0xCFG.nodeSpecs.correlator.disk.virtual : _0xCFG.nodeSpecs.correlator.disk.physical.ssd;
+  return {title:'correlator node', kind:'correlator', isVirt:ctx.isVirt, count:count, spec:spec, comment:''};
+};
+
+var _0xb6ec = function(ctx, count){
+  var agents = ctx.effectiveAgents;
+  var coef = agents > 50000 ? ctx.activeLoadCoefs.dbmsLargeScale : ctx.activeLoadCoefs.dbms;
+  return {
+    title:'DBMS node', kind:'dbms', isVirt:ctx.isVirt, count:count,
+    spec:_0xc4a1(ctx, {nodeCoef:coef, pgOnNode:true, chOnNode:false, ksbOnNode:false, insideKuber:false, minSpecs:_0xCFG.limit.minSpecs.dbms}),
+    comment:''
+  };
+};
+
+var _0xc7fd = function(ctx){
+  var input = ctx.input;
+  var prof = _0xCFG.sandboxProfile[input.sandboxType];
+  var isHW = input.sandboxType !== 'hw_basic' && input.sandboxType !== 'hw_medium' && input.sandboxType !== 'hw_plus';
+  var isHA = input.deploymentScheme === 'ha';
+  var count = Math.max(1, Math.ceil(ctx.effectiveAgents / 200000 * prof.mult));
+  if(isHA) count += 1;
+  return {
+    title:'sandbox node ' + prof.freq, kind:'sb', isVirt:!isHW, count:count,
+    spec:{cpu:prof.cpu, ram:prof.ram, disk:{volumeGiB:prof.disk.volumeGiB, label:prof.disk.label + (prof.disk.count ? ' \n (' + prof.disk.count + '× ' + prof.disk.label + ' ' + (prof.disk.raid === 1 ? 'RAID 1' : 'RAID 10') + ')' : '')}},
+    comment:prof.info
+  };
+};
+
+var _0xd8ae = function(ctx, spec){
+  var cap = ctx.isVirt ? _0xCFG.limit.nodeConstraints.virtualCap : _0xCFG.limit.nodeConstraints.hardwareCap;
+  return spec.cpu > cap.cpu || spec.ram > cap.ram;
+};
+
+var _0xe9bf = function(ctx, opts){
+  var n = _0xCFG.limit.nodeCount.multi.worker;
+  var node = _0xb9e6(ctx, n, opts);
+  while(_0xd8ae(ctx, node.spec)){ n += 1; node = _0xb9e6(ctx, n, opts); }
+  return node;
+};
+
+var _0xfa20 = function(ctx, opts){
+  var n = _0xCFG.limit.nodeCount.multi.worker;
+  var node = _0xb9e6(ctx, n, opts, 1);
+  while(_0xd8ae(ctx, node.spec)){ n += 1; node = _0xb9e6(ctx, n, opts, 1); }
+  return node;
+};
+
+var _0x1b31 = function(ctx){
+  var t = 1;
+  var n = _0xf4ca(ctx, t);
+  while(_0xd8ae(ctx, n.spec)){
+    t += 1;
+    var scaled = {...ctx, effectiveAgents:ctx.effectiveAgents/t, eventCtx:{edr:{...ctx.eventCtx.edr, eps:ctx.eventCtx.edr.eps/t}, external:{...ctx.eventCtx.external, eps:ctx.eventCtx.external.eps/t}}};
+    n = _0xf4ca(scaled, t);
+  }
+  return n;
+};
+
+var _0x2c42 = function(ctx){
+  var t = 1;
+  var n = _0xa5db(ctx, t);
+  while(_0xd8ae(ctx, n.spec)){
+    t += 1;
+    var scaled = {...ctx, effectiveAgents:ctx.effectiveAgents/t, eventCtx:{edr:{...ctx.eventCtx.edr, eps:ctx.eventCtx.edr.eps/t}, external:{...ctx.eventCtx.external, eps:ctx.eventCtx.external.eps/t}}};
+    n = _0xa5db(scaled, t);
+  }
+  return n;
+};
+
+var _0x3d53 = function(ctx, count){
+  var n = _0xc1f7(ctx, count);
+  if(_0xd8ae(ctx, n.spec)){
+    return {collector:_0x1b31(ctx), correlator:_0x2c42(ctx)};
+  }
+  return {kuma:n};
+};
+
+var _0x4e64 = function(input){
+  var isVirt = input.platform !== 'hardware';
+  var isKvm = _0x9d4c(input.platform);
+  var isSmall = input.deploymentScheme === 'single' && (input.platform === 'esxi' || isKvm);
+  var agents = _0xe7b2(input);
+  var isSmalltenant = agents <= 750 && isSmall;
+  var extEps = _0x3b5f(input.externalEps, isSmall, 500);
+  if(extEps > 0 && isSmalltenant){ isSmalltenant = false; agents = 1000; }
+  var halfEps = agents / 2;
+  halfEps = input.enableIOAOnly ? _0x2a9e(halfEps * 0.3) : halfEps;
+  var eventCtx = {
+    edr:{eps:halfEps, eventSize:input.edrEventSize},
+    external:{eps:extEps, eventSize:input.externalEventSize}
+  };
+  var total = input.linuxEndpoints + input.windowsEndpoints + input.macEndpoints;
+  var ksb = input.ksbEndpoints > total ? total : input.ksbEndpoints;
+  ksb = _0x3b5f(ksb, true);
+
+  var hotStorage = 0;
+  if(input.kumaHotStorageDays > 0){
+    var m = input.kumaHotStorageDays + 1;
+    var h = 0;
+    h += 37.14 * halfEps * (input.edrEventSize / 600) / 1024;
+    h += 37.14 * extEps * (input.externalEventSize / 600) / 1024;
+    hotStorage = h * m;
+  }
+  var coldStorage = 0;
+  if(input.kumaColdStorageDays > 0){
+    var m = input.kumaColdStorageDays + 1;
+    var h = 0;
+    h += 37.14 * halfEps * (input.edrEventSize / 600) / 1024;
+    h += 37.14 * extEps * (input.externalEventSize / 600) / 1024;
+    coldStorage = Math.ceil(h * m / 0.95);
+  }
+  var archiveStorage = 0;
+  if(input.kumaArchiveStorageDays > 0){
+    var m = input.kumaArchiveStorageDays + 1;
+    var h = 0;
+    h += 37.14 * halfEps * (input.edrEventSize / 600) / 1024;
+    h += 37.14 * extEps * (input.externalEventSize / 600) / 1024;
+    archiveStorage = Math.ceil(h * m / 0.95);
+  }
+
+  var loadCoefs = isSmalltenant ? _0xCFG.loadCoefs.smalltenant : _0xCFG.loadCoefs[input.deploymentScheme];
+  var ctx = {
+    input:input, isVirt:isVirt, isKvm:isKvm, isSmalltenant:isSmalltenant,
+    effectiveAgents:agents, eventCtx:eventCtx, ksbEndpoints:ksb,
+    activeLoadCoefs:loadCoefs, hotStorage:hotStorage, coldStorage:coldStorage, archiveStorage:archiveStorage
+  };
+
+  var guidance = _0xCFG.defaultGuidanceList.slice();
+  if(archiveStorage > 0) guidance.push('Архив: для хранения архивов можно использовать любой носитель, включая USB Flash.');
+  if(input.platform === 'hardware'){
+    if(input.diskType === 'ssd'){
+      guidance.push('SSD-хранилище: для узлов хранения данных и горячего хранилища рекомендуется использовать NVMe SSD.');
+    } else {
+      guidance.push('Рекомендуется использовать SSD.');
+      guidance.push('HDD-хранилище: требуется RAID 10 на SAS-дисках 10 000+ об/мин. RAID-контроллер должен иметь BBU и кэш write-back.');
+    }
+    if(archiveStorage > 0) guidance.push('Для архивного хранилища рекомендуется использовать HDD большой ёмкости.');
+  }
+  if(isSmalltenant && !input.enableExtDBMS) guidance.push('Для smalltenant-развёртываний на Singlenode ESXi (50-750 эффективных агентов) с PostgreSQL на том же узле рекомендуется ограничить PostgreSQL 5 GiB RAM.');
+  if(input.deploymentScheme === 'multi' || input.deploymentScheme === 'ha'){
+    var p = function(n, w){return n + ' ' + w + (n > 1 ? 's' : '');};
+    guidance.push('Топология ClickHouse: ' + p(input.shardsClickHouse, 'shard') + ', ' + p(input.replicasClickHouse, 'replica') + ' на шард (всего ' + p(input.shardsClickHouse * input.replicasClickHouse, 'node') + ').');
+    if(input.shardsClickHouse * input.replicasClickHouse > 1) guidance.push('Настройте Round Robin распределение для инстансов ClickHouse storage.');
+  }
+
+  var archiveLabel = archiveStorage > 0 ? _0x8c1d(archiveStorage) : '';
+  var nodes = {};
+  var nc = _0xCFG.limit.nodeCount;
+
+  if(input.deploymentScheme === 'single'){
+    nodes.cn = _0xf3c4(ctx, nc.single.cn);
+    nodes.sb = _0xc7fd(ctx);
+    if(input.enableExtDBMS) nodes.dbms = _0xb6ec(ctx, nc.single.dbms);
+  } else if(input.deploymentScheme === 'kedr_multi'){
+    nodes.controller = _0xa8d5(ctx, nc.kedr_multi.controller);
+    nodes.worker1 = _0xb9e6(ctx, nc.kedr_multi.w1, {workerKind:'worker1', pgOnNode:false, chOnNode:true});
+    nodes.worker2 = _0xb9e6(ctx, nc.kedr_multi.w2, {workerKind:'worker2', pgOnNode:false, chOnNode:false});
+    nodes.worker3 = _0xb9e6(ctx, nc.kedr_multi.w3, {workerKind:'worker3', pgOnNode:!input.enableExtDBMS, chOnNode:false});
+    nodes.sb = _0xc7fd(ctx);
+    if(input.enableExtDBMS) nodes.dbms = _0xb6ec(ctx, 1);
+  } else if(input.deploymentScheme === 'multi'){
+    var kumaResult = _0x3d53(ctx, nc.multi.kuma);
+    nodes.controller = _0xa8d5(ctx, nc.multi.controller);
+    nodes.worker = _0xe9bf(ctx, {workerKind:'worker', pgOnNode:false, chOnNode:false});
+    nodes.dbms = _0xb6ec(ctx, nc.multi.dbms);
+    nodes.sb = _0xc7fd(ctx);
+    if(kumaResult.kuma) nodes.kuma = kumaResult.kuma;
+    if(kumaResult.collector) nodes.collector = kumaResult.collector;
+    if(kumaResult.correlator) nodes.correlator = kumaResult.correlator;
+    var shards = input.shardsClickHouse * input.replicasClickHouse;
+    if(shards === 1){
+      var k = input.enableCombinedKeeper ? input.keepersClickHouse - 1 : input.keepersClickHouse;
+      if(k > 0) nodes.keeper = _0xe3b9(ctx, k);
+    } else if(!input.enableCombinedKeeper){
+      nodes.storage = _0xd2a8(ctx, shards, false);
+      nodes.keeper = _0xe3b9(ctx, input.keepersClickHouse);
+    } else {
+      var combined = Math.min(shards, input.keepersClickHouse);
+      var separate = shards - combined;
+      var keeperExtra = input.keepersClickHouse - combined;
+      var storageArr = [_0xd2a8(ctx, combined, true)];
+      if(separate > 0) storageArr.push(_0xd2a8(ctx, separate, false));
+      nodes.storage = storageArr;
+      if(keeperExtra > 0) nodes.keeper = _0xe3b9(ctx, keeperExtra);
+    }
+  } else if(input.deploymentScheme === 'ha'){
+    var collector = _0x1b31(ctx);
+    var correlator = _0x2c42(ctx);
+    nodes.controller = _0xa8d5(ctx, nc.ha.controller);
+    nodes.worker = _0xfa20(ctx, {workerKind:'worker', pgOnNode:false, chOnNode:false});
+    nodes.collector = {...collector, count:collector.count + 1};
+    nodes.correlator = {...correlator, count:correlator.count * 2};
+    nodes.dbms = _0xb6ec(ctx, nc.ha.dbms);
+    nodes.sb = _0xc7fd(ctx);
+    nodes.storage = _0xd2a8(ctx, input.shardsClickHouse * input.replicasClickHouse, false);
+    var keepers = input.keepersClickHouse;
+    if(input.enableCombinedKeeper) keepers -= nc.ha.controller;
+    if(keepers > 0) nodes.keeper = _0xe3b9(ctx, keepers);
+  } else if(input.deploymentScheme === 'hierarchy'){
+    nodes.pcn = {
+      title:'primary node', kind:'pcn', isVirt:ctx.isVirt, count:nc.hierarchy.pcn,
+      spec:_0xc4a1(ctx, {nodeCoef:{base:{cpu:5.5 + 0.016 * (halfEps + extEps) / 1000, ram:54 + 0.032 * (halfEps + extEps) / 1000}, step:loadCoefs.pcn.step}, pgOnNode:true, chOnNode:true, ksbOnNode:true, insideKuber:true, minSpecs:_0xCFG.limit.minSpecs.cn, hierarchy:{totalEps:halfEps + extEps}}),
+      comment:agents > 0 ? 'effective agents: ' + agents : ''
+    };
+    nodes.sb = _0xc7fd(ctx);
+  }
+
+  var totals = Object.keys(nodes).reduce(function(acc, key){
+    var arr = _0x1e7a(nodes[key]);
+    for(var i=0;i<arr.length;i++){
+      var n = arr[i];
+      acc.totalNodes += n.count;
+      acc.totalCpu += n.spec.cpu * n.count;
+      acc.totalRam += n.spec.ram * n.count;
+      acc.totalStorageGiB += n.spec.disk.volumeGiB * n.count;
+      acc.totalColdStorageGiB += (n.spec.disk.coldVolumeGiB || 0) * n.count;
+    }
+    return acc;
+  }, {totalNodes:0, totalCpu:0, totalRam:0, totalStorageGiB:0, totalColdStorageGiB:0});
+
+  var chQuality = 0;
+  if('storage' in nodes){
+    var storageArr = _0x1e7a(nodes.storage);
+    if(storageArr[0] && storageArr[0].spec.ram){
+      chQuality = hotStorage / input.shardsClickHouse / storageArr[0].spec.ram;
+    }
+  }
+
+  return {
+    mode:input.mode,
+    effectiveAgents:agents,
+    edrEps:halfEps,
+    externalEps:extEps,
+    ksbEndpoints:ksb,
+    archiveStorageLabel:archiveLabel,
+    nodes:nodes,
+    totals:{
+      totalNodes:totals.totalNodes,
+      totalCpu:totals.totalCpu,
+      totalRam:totals.totalRam,
+      totalStorage:_0x8c1d(totals.totalStorageGiB),
+      totalColdStorage:totals.totalColdStorageGiB > 0 ? _0x8c1d(totals.totalColdStorageGiB) : '',
+      totalArchiveStorage:archiveLabel
+    },
+    chQuality:chQuality,
+    guidance:guidance
+  };
+};
+
+var _0x5f75 = function(state, field, value){
+  if(field === 'deploymentScheme'){
+    var s = {...state, deploymentScheme:value};
+    var ch = _0xCFG.limit.clickHouse;
+    if(s.deploymentScheme === 'multi' || s.deploymentScheme === 'ha'){
+      s.replicasClickHouse = ch.replicas[s.deploymentScheme];
+      s.keepersClickHouse = ch.keepers[s.deploymentScheme];
+    } else {
+      s.replicasClickHouse = 1;
+      s.keepersClickHouse = 1;
+    }
+    if(s.deploymentScheme === 'multi' || s.deploymentScheme === 'ha') s.diskType = 'ssd';
+    if(s.deploymentScheme === 'single' || s.deploymentScheme === 'hierarchy') s.enableCombinedKeeper = true;
+    if(s.deploymentScheme !== 'single' && s.deploymentScheme !== 'kedr_multi') s.enableExtDBMS = false;
+    if(s.deploymentScheme !== 'hierarchy') s.emptyPrimary = false;
+    var agents = _0xe7b2(s);
+    var limit = _0xCFG.limit.agentsPerScheme.default[s.deploymentScheme].edr;
+    if(agents > limit){
+      for(var i=0;i<_ny.length;i++) s[_ny[i]] = 0;
+      s.externalEps = 0;
+    }
+    return s;
+  }
+  if(field === 'platform'){
+    var s = {...state, platform:value};
+    if(!_0x9d4c(s.platform)) s.hypervisorOption = 'not_vulnerable';
+    return s;
+  }
+  if(field === 'hypervisorOption') return {...state, hypervisorOption:value};
+  if(field === 'diskType') return {...state, diskType:value};
+  if(field === 'replicasClickHouse'){
+    var s = {...state, replicasClickHouse:Number(value)};
+    var ch = _0xCFG.limit.clickHouse;
+    if(s.replicasClickHouse < ch.replicas[s.deploymentScheme]) s.replicasClickHouse = ch.replicas[s.deploymentScheme];
+    if(s.replicasClickHouse > ch.maxReplicas) s.replicasClickHouse = ch.maxReplicas;
+    return s;
+  }
+  if(field === 'keepersClickHouse'){
+    var s = {...state, keepersClickHouse:Number(value)};
+    var ch = _0xCFG.limit.clickHouse;
+    if(s.keepersClickHouse < ch.keepers[s.deploymentScheme]) s.keepersClickHouse = ch.keepers[s.deploymentScheme];
+    return s;
+  }
+  if(field === 'enableCombinedKeeper') return {...state, enableCombinedKeeper:!!value};
+  if(field === 'enableExtDBMS') return {...state, enableExtDBMS:!!value};
+  if(field === 'emptyPrimary') return {...state, emptyPrimary:!!value};
+  if(field === 'enableIOAOnly') return {...state, enableIOAOnly:!!value};
+  if(_ny.indexOf(field) !== -1){
+    var s = {...state};
+    s[field] = Number(value);
+    var agents = _0xe7b2(s);
+    var limit = _0xCFG.limit.agentsPerScheme.default[s.deploymentScheme].edr;
+    if(agents > limit){
+      var lo = 0, hi = s[field];
+      while(lo < hi){
+        var mid = Math.ceil((lo + hi) / 2);
+        var copy = {...s};
+        copy[field] = mid;
+        if(_0xe7b2(copy) <= limit) lo = mid;
+        else hi = mid - 1;
+      }
+      s[field] = lo;
+    }
+    return s;
+  }
+  if(field === 'externalEps'){
+    var s = {...state, externalEps:Number(value)};
+    var limit = _0xCFG.limit.agentsPerScheme.default[s.deploymentScheme].external;
+    if(s.externalEps > limit) s.externalEps = limit;
+    return s;
+  }
+  if(field === 'kumaHotStorageDays') return {...state, kumaHotStorageDays:Number(value)};
+  if(field === 'kumaColdStorageDays') return {...state, kumaColdStorageDays:Number(value)};
+  if(field === 'coldStorageDiskType') return {...state, coldStorageDiskType:value};
+  if(field === 'kumaArchiveStorageDays') return {...state, kumaArchiveStorageDays:Number(value)};
+  if(field === 'storageConfig') return {...state, storageConfig:value};
+  if(field === 'sandboxType'){
+    var s = {...state, sandboxType:value};
+    if(!_0x9d4c(s.platform)) s.sbHypervisorOption = 'not_vulnerable';
+    return s;
+  }
+  if(field === 'sbHypervisorOption') return {...state, sbHypervisorOption:value};
+  if(field === 'ksbEndpoints'){
+    var s = {...state, ksbEndpoints:Number(value)};
+    var total = s.windowsEndpoints + s.linuxEndpoints + s.macEndpoints;
+    s.ksbEndpoints = Math.min(Number(value), total);
+    return s;
+  }
+  var s = {...state};
+  s[field] = value;
+  return s;
+};
+
+var _state = {..._DEF};
+
+function _el(tag, attrs){
+  var n = document.createElement(tag);
+  if(attrs){
+    var keys = Object.keys(attrs);
+    for(var i=0;i<keys.length;i++){
+      var k = keys[i];
+      var v = attrs[k];
+      if(k === 'class') n.className = v;
+      else if(k.indexOf('on') === 0) n.addEventListener(k.slice(2), v);
+      else if(v !== false && v != null) n.setAttribute(k, v === true ? '' : v);
+    }
+  }
+  var children = [];
+  for(var i=2;i<arguments.length;i++) children.push(arguments[i]);
+  var flat = [];
+  (function flatten(arr){
+    for(var i=0;i<arr.length;i++){
+      if(Array.isArray(arr[i])) flatten(arr[i]);
+      else if(arr[i] != null && arr[i] !== false) flat.push(arr[i]);
+    }
+  })(children);
+  for(var i=0;i<flat.length;i++){
+    var c = flat[i];
+    if(c.nodeType) n.appendChild(c);
+    else n.appendChild(document.createTextNode(String(c)));
+  }
+  return n;
+}
+
+function _set(field, value){
+  _state = _0x5f75(_state, field, value);
+  _render();
+}
+
+var _uid = 0;
+function _sel(label, field, opts, hint){
+  var id = 'f' + (_uid++);
+  var options = [];
+  for(var i=0;i<opts.length;i++){
+    var o = opts[i];
+    options.push(_el('option', {value:o.value, selected:String(o.value) === String(_state[field]), disabled:!!o.disabled}, o.label));
+  }
+  var s = _el.apply(null, ['select', {id:id, onchange:function(e){_set(field, e.target.value);}}].concat(options));
+  var labelEl = _el('label', {for:id}, label);
+  if(hint) labelEl.appendChild(_el('span', {class:'hint'}, hint));
+  return _el('div', {class:'row'}, labelEl, s);
+}
+function _num(label, field, opts){
+  opts = opts || {};
+  var id = 'f' + (_uid++);
+  var i = _el('input', {id:id, type:'number', min:opts.min || 0, max:opts.max, step:1, value:_state[field], readonly:!!opts.readOnly,
+    onchange:function(e){
+      var raw = e.target.value;
+      var v = raw === '' ? 0 : Number(raw);
+      if(!Number.isFinite(v)) v = opts.min || 0;
+      v = Math.trunc(v);
+      if(opts.max != null) v = Math.min(v, opts.max);
+      v = Math.max(v, opts.min || 0);
+      _set(field, v);
+    }});
+  var labelEl = _el('label', {for:id}, label);
+  if(opts.hint) labelEl.appendChild(_el('span', {class:'hint'}, opts.hint));
+  return _el('div', {class:'row'}, labelEl, i);
+}
+function _chk(label, field, hint){
+  var id = 'f' + (_uid++);
+  var labelEl = _el('label', {for:id}, label);
+  if(hint) labelEl.appendChild(_el('span', {class:'hint'}, hint));
+  return _el('div', {class:'row'}, labelEl, _el('input', {id:id, type:'checkbox', checked:!!_state[field], onchange:function(e){_set(field, e.target.checked);}}));
+}
+
+function _renderForm(totalEff){
+  var isVirt = _state.platform !== 'hardware';
+  var isKvm = ['nutanix','proxmox','brest','redvirt','zvirt'].indexOf(_state.platform) !== -1;
+  var sbKvm = ['brest','redvirt','zvirt'].indexOf(_state.sandboxType) !== -1;
+  var agentLimit = _0xCFG.limit.agentsPerScheme.default[_state.deploymentScheme].edr;
+  var ms = _state.deploymentScheme === 'multi' || _state.deploymentScheme === 'ha';
+  var devTotal = _state.windowsEndpoints + _state.linuxEndpoints + _state.macEndpoints;
+  _uid = 0;
+
+  var parts = [];
+
+  var fs1 = _el('fieldset', null, _el('legend', null, 'Развёртывание'));
+  fs1.appendChild(_sel('Схема', 'deploymentScheme', _OPT.deploymentScheme, 'Hierarchy подразумевает Single node инстансы'));
+  fs1.appendChild(_sel('Платформа', 'platform', _OPT.platform));
+  if(isKvm) fs1.appendChild(_sel('Опции гипервизора', 'hypervisorOption', _OPT.hypervisorOption, 'Spectre/Meltdown mitigations'));
+  if(!ms && !isVirt) fs1.appendChild(_sel('Тип дисков', 'diskType', _OPT.diskType));
+  if(ms) fs1.appendChild(_num('Реплик ClickHouse', 'replicasClickHouse', {min:_0xCFG.limit.clickHouse.replicas[_state.deploymentScheme], max:_0xCFG.limit.clickHouse.maxReplicas}));
+  if(ms){
+    var keepersOpts = _state.deploymentScheme === 'ha' ? _OPT.keepers.filter(function(k){return Number(k.value) >= _0xCFG.limit.clickHouse.keepers.ha;}) : _OPT.keepers;
+    fs1.appendChild(_sel('Keeper-ов ClickHouse', 'keepersClickHouse', keepersOpts));
+  }
+  if(ms) fs1.appendChild(_chk('Keeper на нодах платформы', 'enableCombinedKeeper'));
+  if(_state.deploymentScheme === 'single' || _state.deploymentScheme === 'kedr_multi') fs1.appendChild(_chk('Внешняя СУБД', 'enableExtDBMS'));
+  if(_state.deploymentScheme === 'hierarchy') fs1.appendChild(_chk('Пустая primary-нода', 'emptyPrimary'));
+  fs1.appendChild(_chk('Телеметрия только с IOA', 'enableIOAOnly'));
+  parts.push(fs1);
+
+  var fs2 = _el('fieldset', null, _el('legend', null, 'Устройства'));
+  fs2.appendChild(_el('div', {class:'sub'}, 'Windows'));
+  fs2.appendChild(_num('Рабочие станции', 'windowsEndpoints'));
+  fs2.appendChild(_num('Серверы', 'windowsServers'));
+  fs2.appendChild(_el('div', {class:'sub'}, 'Linux'));
+  fs2.appendChild(_num('Рабочие станции', 'linuxEndpoints'));
+  fs2.appendChild(_num('Серверы', 'linuxServers'));
+  fs2.appendChild(_el('div', {class:'sub'}, 'macOS'));
+  fs2.appendChild(_num('Рабочие станции', 'macEndpoints'));
+  var overLimit = totalEff > agentLimit;
+  fs2.appendChild(_el('div', {class:'limit' + (overLimit ? ' over' : '')}, 'Эффективных агентов: ' + totalEff.toLocaleString('ru-RU') + ' из ' + agentLimit.toLocaleString('ru-RU') + ' для схемы'));
+  parts.push(fs2);
+
+  var fs3 = _el('fieldset', null, _el('legend', null, 'Хранение (KUMA / ClickHouse)'));
+  fs3.appendChild(_num('Горячее, дней', 'kumaHotStorageDays', {max:_0xCFG.limit.kuma.maxHotDays}));
+  fs3.appendChild(_num('Холодное, дней', 'kumaColdStorageDays', {max:_0xCFG.limit.kuma.maxColdDays}));
+  fs3.appendChild(_num('Архив, дней', 'kumaArchiveStorageDays', {max:_0xCFG.limit.kuma.maxArchiveDays}));
+  if(!isVirt) fs3.appendChild(_sel('Диски холодного хранения', 'coldStorageDiskType', _OPT.diskType));
+  if(_state.shardsClickHouse * _state.replicasClickHouse > 1) fs3.appendChild(_sel('Конфигурация storage-нод', 'storageConfig', _OPT.storageConfig));
+  parts.push(fs3);
+
+  var fs4 = _el('fieldset', null, _el('legend', null, 'Sandbox'));
+  fs4.appendChild(_sel('Тип песочницы', 'sandboxType', _OPT.sandboxType));
+  if(sbKvm) fs4.appendChild(_sel('Опции гипервизора', 'sbHypervisorOption', _OPT.hypervisorOption));
+  fs4.appendChild(_num('KSB-эндпоинтов', 'ksbEndpoints', {hint:'Автоотправка объектов на динамический анализ'}));
+  var ksbOver = _state.ksbEndpoints > devTotal;
+  fs4.appendChild(_el('div', {class:'limit' + (ksbOver ? ' over' : '')}, 'Лимит: ' + devTotal.toLocaleString('ru-RU') + (ksbOver ? ' · превышен' : '')));
+  parts.push(fs4);
+
+  return parts;
+}
+
+var _fmt = function(n){return typeof n === 'number' ? n.toLocaleString('ru-RU') : n;};
+function _nodeList(o){
+  var keys = Object.keys(o.nodes);
+  keys.sort(function(a, b){return _iy.indexOf(a) - _iy.indexOf(b);});
+  var result = [];
+  for(var i=0;i<keys.length;i++){
+    var v = o.nodes[keys[i]];
+    if(v){
+      var arr = Array.isArray(v) ? v : [v];
+      for(var j=0;j<arr.length;j++) result.push(arr[j]);
+    }
+  }
+  return result;
+}
+
+function _copyText(text){
+  return new Promise(function(resolve, reject){
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(resolve, function(){
+        _fallbackCopy(text, resolve, reject);
+      });
+    } else {
+      _fallbackCopy(text, resolve, reject);
+    }
+  });
+}
+
+function _fallbackCopy(text, resolve, reject){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.top = '-9999px';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    var ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(ok) resolve();
+    else reject(new Error('Copy failed'));
+  } catch(e){
+    document.body.removeChild(ta);
+    reject(e);
+  }
+}
+
+function _buildCopyText(o){
+  var nodes = _nodeList(o);
+  var t = o.totals;
+  var lines = [];
+  lines.push('Сайзинг EDR 8.3');
+  lines.push('Схема: ' + _state.deploymentScheme + ', платформа: ' + _state.platform);
+  lines.push('Эффективных агентов: ' + o.effectiveAgents);
+  lines.push('EDR EPS: ' + o.edrEps);
+  if(o.externalEps > 0) lines.push('Внешний EPS: ' + o.externalEps);
+  lines.push('Горячее хранение: ' + _state.kumaHotStorageDays + ' дн.');
+  if(_state.kumaColdStorageDays > 0) lines.push('Холодное хранение: ' + _state.kumaColdStorageDays + ' дн.');
+  if(_state.kumaArchiveStorageDays > 0) lines.push('Архив: ' + _state.kumaArchiveStorageDays + ' дн.');
+  lines.push('');
+  lines.push('--- Ноды ---');
+  for(var i=0;i<nodes.length;i++){
+    var n = nodes[i];
+    var line = n.count + ' × ' + n.title + ' (' + (n.isVirt ? 'virtual' : 'physical') + ')';
+    line += ': ' + n.spec.cpu + ' CPU, ' + n.spec.ram + ' GiB RAM';
+    line += ', диск: ' + n.spec.disk.label.replace(/\s*\n\s*/g, ' ');
+    if(n.spec.disk.coldLabel){
+      line += ', холодное: ' + n.spec.disk.coldLabel.replace(/\s*\n\s*/g, ' ');
+    }
+    if(n.comment){
+      line += ' [' + n.comment.replace(/\n/g, '; ') + ']';
+    }
+    lines.push(line);
+  }
+  lines.push('');
+  lines.push('--- Итого ---');
+  lines.push('Нод: ' + t.totalNodes);
+  lines.push('CPU: ' + t.totalCpu);
+  lines.push('RAM: ' + t.totalRam + ' GiB');
+  lines.push('Хранилище: ' + t.totalStorage);
+  if(t.totalColdStorage) lines.push('Холодное хранилище: ' + t.totalColdStorage);
+  if(t.totalArchiveStorage) lines.push('Архив: ' + t.totalArchiveStorage);
+  return lines.join('\n');
+}
+
+function _showCopySuccess(btn, toast){
+  var originalText = btn.textContent;
+  btn.classList.add('copied');
+  btn.textContent = '✓ Скопировано';
+  toast.textContent = '✓ Сайзинг скопирован в буфер обмена';
+  toast.classList.add('show');
+  setTimeout(function(){
+    btn.classList.remove('copied');
+    btn.textContent = originalText;
+  }, 2000);
+  setTimeout(function(){
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+function _showCopyError(toast){
+  toast.textContent = '✗ Не удалось скопировать';
+  toast.classList.add('show');
+  setTimeout(function(){
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+function _renderOut(o){
+  var nodes = _nodeList(o);
+  var t = o.totals;
+  var q = _0xCFG.limit.clickHouse.quality;
+  var hasCold = nodes.some(function(n){return !!n.spec.disk.coldLabel;});
+
+  var loadChildren = [
+    _el('div', null, _el('b', null, _fmt(o.effectiveAgents)), _el('span', null, 'эффективных агентов')),
+    _el('div', null, _el('b', null, _fmt(o.edrEps)), _el('span', null, 'EDR EPS (оценка)'))
+  ];
+  if(o.externalEps > 0) loadChildren.push(_el('div', null, _el('b', null, _fmt(o.externalEps)), _el('span', null, 'внешний EPS')));
+  if(o.ksbEndpoints > 0) loadChildren.push(_el('div', null, _el('b', null, _fmt(o.ksbEndpoints)), _el('span', null, 'KSB-эндпоинтов')));
+  var load = _el.apply(null, ['div', {class:'load'}].concat(loadChildren));
+
+  var tbody = _el('tbody');
+  for(var i=0;i<nodes.length;i++){
+    var n = nodes[i];
+    var tr = _el('tr');
+    tr.appendChild(_el('td', {class:'cnt'}, String(n.count) + ' ×'));
+    var titleTd = _el('td');
+    titleTd.appendChild(document.createTextNode(n.title));
+    tr.appendChild(titleTd);
+    tr.appendChild(_el('td', {class:'n'}, _fmt(n.spec.cpu)));
+    tr.appendChild(_el('td', {class:'n'}, _fmt(n.spec.ram)));
+    tr.appendChild(_el('td', {class:'disk'}, n.spec.disk.label));
+    if(hasCold){
+      tr.appendChild(_el('td', {class:'disk'}, n.spec.disk.coldLabel || ''));
+    }
+    tr.appendChild(_el('td', {class:'cm'}, n.comment || ''));
+    tbody.appendChild(tr);
+  }
+  
+  var totalTr = _el('tr', {class:'total'});
+  totalTr.appendChild(_el('td', null, String(t.totalNodes)));
+  totalTr.appendChild(_el('td', null, 'Итого нод'));
+  totalTr.appendChild(_el('td', {class:'n'}, _fmt(t.totalCpu)));
+  totalTr.appendChild(_el('td', {class:'n'}, _fmt(t.totalRam)));
+  totalTr.appendChild(_el('td', null, t.totalStorage));
+  if(hasCold){
+    totalTr.appendChild(_el('td', null, t.totalColdStorage));
+  }
+  totalTr.appendChild(_el('td', null, t.totalArchiveStorage ? 'Архив: ' + t.totalArchiveStorage : ''));
+  tbody.appendChild(totalTr);
+
+  var thead = _el('thead');
+  var headTr = _el('tr');
+  headTr.appendChild(_el('th', null, 'Кол-во'));
+  headTr.appendChild(_el('th', null, 'Роль'));
+  headTr.appendChild(_el('th', null, 'CPU / vCPU'));
+  headTr.appendChild(_el('th', null, 'RAM, GiB'));
+  headTr.appendChild(_el('th', null, 'Диск'));
+  if(hasCold){
+    headTr.appendChild(_el('th', null, 'Холодное'));
+  }
+  headTr.appendChild(_el('th', null, 'Примечание'));
+  thead.appendChild(headTr);
+
+  var table = _el('div', {class:'tablewrap'},
+    _el('table', null, thead, tbody)
+  );
+
+  var quality = null;
+  if('storage' in o.nodes){
+    var qClass = 'quality' + (o.chQuality > q.warning ? ' warn' : '');
+    var qText = 'ClickHouse quality: ' + o.chQuality.toFixed(0) + '. ' + (o.chQuality > q.warning ? 'Threat hunting может работать медленнее на такой конфигурации.' : 'Конфигурация хранилища приемлемая.');
+    quality = _el('div', {class:qClass}, qText);
+  }
+
+  var guideItems = [];
+  for(var i=0;i<o.guidance.length;i++){
+    var g = o.guidance[i];
+    if(typeof g === 'object' && g.bold) guideItems.push(_el('li', null, _el('strong', null, g.text)));
+    else guideItems.push(_el('li', null, g));
+  }
+  var guide = _el('details', {open:true},
+    _el('summary', null, 'Рекомендации и требования'),
+    _el.apply(null, ['ul'].concat(guideItems))
+  );
+
+  var toast = _el('span', {id:'toast'});
+
+  var copyBtn = _el('button', {class:'act', onclick:function(){
+    var text = _buildCopyText(o);
+    _copyText(text).then(function(){
+      _showCopySuccess(copyBtn, toast);
+    }, function(){
+      _showCopyError(toast);
+    });
+  }}, '📋 Скопировать сайзинг');
+
+  var actions = _el('div', {class:'actions'}, copyBtn, toast);
+
+  var disclaimer = _el('div', {class:'disclaimer'},
+    _el('div', {class:'disclaimer-title'}, '⚠️ Важная информация'),
+    _el('p', null, 'Данный калькулятор является независимым инструментом и ',
+      _el('strong', null, 'не относится к официальным ресурсам АО «Лаборатория Касперского»'), '.'),
+    _el('p', null, 'Результаты расчётов носят справочный характер и основаны на опубликованной методике сайзинга. Для получения официальных рекомендаций по архитектуре и ресурсам необходимо:'),
+    _el('ul', null,
+      _el('li', null, 'Свериться с официальной технической документацией Kaspersky EDR Expert'),
+      _el('li', null, 'Согласовать финальную спецификацию с ответственным представителем вендора'),
+      _el('li', null, 'Учесть особенности вашей инфраструктуры, которые могут повлиять на требования к ресурсам')),
+    _el('p', {style:'margin-top:8px;font-style:italic'}, 'Разработчик калькулятора не несёт ответственности за расхождения между расчётными и фактическими требованиями.'));
+
+  var result = [disclaimer, load, table];
+  if(quality) result.push(quality);
+  result.push(guide);
+  result.push(actions);
+  return result;
+}
+
+function _render(){
+  var formEl = document.getElementById('form');
+  var outEl = document.getElementById('out');
+  var focusId = document.activeElement && document.activeElement.id;
+  try {
+    var isVirtSingle = _state.deploymentScheme === 'single' && (_state.platform === 'esxi' || ['nutanix','proxmox','brest','redvirt','zvirt'].indexOf(_state.platform) !== -1);
+    var totalEff = _0xe7b2(_state);
+    var formParts = _renderForm(totalEff);
+    formEl.replaceChildren();
+    for(var i=0;i<formParts.length;i++) formEl.appendChild(formParts[i]);
+    var outParts = _renderOut(_0x4e64(_state));
+    outEl.replaceChildren();
+    for(var i=0;i<outParts.length;i++) outEl.appendChild(outParts[i]);
+  } catch(err){
+    outEl.replaceChildren();
+    outEl.appendChild(_el('p', {class:'err'}, 'Ошибка расчёта:\n' + err.message));
+  }
+  if(focusId){
+    var f = document.getElementById(focusId);
+    if(f) f.focus();
+  }
+}
+
+var _themeToggle = document.getElementById('themeToggle');
+var _themeIcon = document.getElementById('themeIcon');
+var _themeLabel = document.getElementById('themeLabel');
+var _sunSvg = '<path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-3a1 1 0 0 0 1-1V1a1 1 0 1 0-2 0v2a1 1 0 0 0 1 1zm0 18a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0v-2a1 1 0 0 0-1-1zM4.22 4.22a1 1 0 0 0 1.41 1.41l1.42-1.41a1 1 0 0 0-1.42-1.42L4.22 4.22zm14.14 14.14a1 1 0 0 0-1.41 1.42l1.41 1.41a1 1 0 0 0 1.42-1.41l-1.42-1.42zM1 13h2a1 1 0 1 0 0-2H1a1 1 0 1 0 0 2zm20-2h2a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2zM5.64 19.78a1 1 0 0 0-1.42-1.42l-1.41 1.42a1 1 0 0 0 1.41 1.41l1.42-1.41zM19.78 5.64a1 1 0 0 0 1.41-1.42l-1.41-1.41a1 1 0 0 0-1.42 1.41l1.42 1.42z"/>';
+var _moonSvg = '<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>';
+
+function _setThemeIcon(pathMarkup){
+  // Only static, source-controlled SVG path data is used; never parse HTML.
+  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  var match = /^<path d="([^"]+)"\/>$/.exec(pathMarkup);
+  if(match) path.setAttribute('d', match[1]);
+  _themeIcon.replaceChildren(path);
+}
+function _applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('theme', theme); } catch(e) {}
+  if(theme === 'dark'){
+    _setThemeIcon(_sunSvg);
+    _themeLabel.textContent = 'Светлая';
+  } else {
+    _setThemeIcon(_moonSvg);
+    _themeLabel.textContent = 'Тёмная';
+  }
+}
+
+var _savedTheme = 'light';
+try { _savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch(e) {}
+_applyTheme(_savedTheme);
+
+_themeToggle.addEventListener('click', function(){
+  var current = document.documentElement.getAttribute('data-theme') || 'light';
+  _applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+_render();
+
+})();
+</script>
+</body>
+</html>
